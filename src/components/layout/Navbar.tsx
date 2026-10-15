@@ -1,4 +1,4 @@
-import { Menu, X } from 'lucide-react'
+import { Lock, Menu, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -123,6 +123,17 @@ export function Navbar() {
                 </Link>
               </li>
             ))}
+            {/* 后台没有其他入口，只能手输地址。这里给一个显式入口：
+                已登录时守卫直接放行，未登录则被拦到登录页，登录后回到 /admin */}
+            <li className="ml-2 border-l border-border pl-2">
+              <Link
+                to="/admin"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-control px-3 text-sm text-fg-muted transition-colors duration-200 ease-standard hover:text-fg"
+              >
+                <Lock size={14} aria-hidden="true" />
+                后台
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -160,6 +171,15 @@ export function Navbar() {
                   </Link>
                 </li>
               ))}
+              <li className="mt-2 border-t border-border pt-2">
+                <Link
+                  to="/admin"
+                  className="flex min-h-12 items-center gap-2 rounded-control px-3 text-base text-fg-muted transition-colors duration-200 ease-standard hover:text-fg"
+                >
+                  <Lock size={16} aria-hidden="true" />
+                  后台
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>

@@ -43,6 +43,22 @@ describe('Navbar', () => {
     expect(screen.getByRole('link', { name: '博客' })).toHaveAttribute('aria-current', 'true')
   })
 
+  it('提供指向后台的入口链接', () => {
+    renderNavbar()
+
+    expect(screen.getByRole('link', { name: '后台' })).toHaveAttribute('href', '/admin')
+  })
+
+  it('移动端菜单里同样提供后台入口', async () => {
+    const user = userEvent.setup()
+    renderNavbar()
+
+    await user.click(toggle())
+
+    const panel = screen.getByRole('navigation', { name: '移动端导航' })
+    expect(panel.querySelector('a[href="/admin"]')).not.toBeNull()
+  })
+
   it('默认不渲染移动端菜单面板', () => {
     renderNavbar()
 
