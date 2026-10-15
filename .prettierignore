@@ -1,0 +1,6 @@
+# 文档是需求与设计的唯一真相来源，不允许被 Prettier 重写
+*.md
+dist
+node_modules
+.vercel
+package-lock.json

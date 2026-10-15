@@ -1,0 +1,296 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------
+   设计令牌（唯一真相来源）
+   组件中只能使用由这些令牌派生的工具类，禁止硬编码色值。
+   详见 TECH_DESIGN.md 5.7 与 AGENTS.md 第五节。
+   --------------------------------------------------------------- */
+@theme {
+  --color-bg: #0b0f1a;
+  --color-surface: #111726;
+  --color-surface-hover: #161d2f;
+  --color-border: rgb(230 234 242 / 0.1);
+  --color-border-strong: rgb(230 234 242 / 0.18);
+  --color-fg: #e6eaf2;
+  --color-fg-muted: #9aa4bf;
+  --color-fg-subtle: #6b7690;
+  --color-accent: #7dd3fc;
+  --color-accent-strong: #38bdf8;
+  --color-accent-soft: rgb(125 211 252 / 0.12);
+  --color-danger: #fca5a5;
+  --color-danger-soft: rgb(252 165 165 / 0.12);
+  --color-success: #86efac;
+  --color-success-soft: rgb(134 239 172 / 0.12);
+
+  --radius-card: 16px;
+  --radius-control: 12px;
+
+  --container-content: 1200px;
+
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --spacing-section: 4rem;
+  --spacing-gutter: 1.25rem;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Source Han Sans SC', 'Noto Sans CJK SC', sans-serif;
+  --font-mono:
+    ui-monospace, 'SFMono-Regular', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+/* 强调色的运行时可替换入口：改这一个变量即可整体换色（PRD 4.1） */
+:root {
+  --accent: #7dd3fc;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* 星空画布固定在视口上，页面本身不需要单独的背景层 */
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* 滚动条配色，避免默认浅色滚动条在深色主题下突兀 */
+  * {
+    scrollbar-color: var(--color-border-strong) transparent;
+    scrollbar-width: thin;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ---------------------------------------------------------------
+   滚动入场动画
+   默认（无动效偏好）内容直接可见；仅在用户允许动效时才隐藏待入场，
+   这样即使 JS 失效也不会出现空白内容。
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 600ms var(--ease-standard),
+      transform 600ms var(--ease-standard);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 用户的系统级降级：终止一切动画与平滑滚动（PRD 4.4 / 4.6） */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   文章正文排版（Markdown 渲染结果的默认样式）
+   --------------------------------------------------------------- */
+.prose-custom {
+  color: var(--color-fg);
+}
+
+.prose-custom > * + * {
+  margin-top: 1rem;
+}
+
+.prose-custom h2,
+.prose-custom h3,
+.prose-custom h4 {
+  /* 与吸顶导航高度对齐，避免标题被遮挡 */
+  scroll-margin-top: 5.5rem;
+  font-weight: 600;
+  color: var(--color-fg);
+}
+
+.prose-custom h2 {
+  margin-top: 2.5rem;
+  font-size: 1.5rem;
+}
+
+.prose-custom h3 {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+}
+
+.prose-custom h4 {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+}
+
+.prose-custom a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-custom strong {
+  color: var(--color-fg);
+  font-weight: 600;
+}
+
+.prose-custom ul,
+.prose-custom ol {
+  padding-left: 1.4rem;
+}
+
+.prose-custom ul {
+  list-style: disc;
+}
+
+.prose-custom ol {
+  list-style: decimal;
+}
+
+.prose-custom li + li {
+  margin-top: 0.35rem;
+}
+
+.prose-custom blockquote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 1rem;
+  color: var(--color-fg-muted);
+  font-style: normal;
+}
+
+/* 行内代码：代码块由 CodeBlock 组件单独处理 */
+.prose-custom code:not(pre code) {
+  background-color: var(--color-accent-soft);
+  color: var(--color-fg);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.875em;
+  font-family: var(--font-mono);
+}
+
+.prose-custom table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.prose-custom th,
+.prose-custom td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.prose-custom th {
+  background-color: var(--color-surface);
+}
+
+.prose-custom img {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+}
+
+.prose-custom hr {
+  border-color: var(--color-border);
+  margin: 2.5rem 0;
+}
+
+/* 代码高亮主题（highlight.js 类名），配色取自设计令牌 */
+.hljs-comment,
+.hljs-quote {
+  color: var(--color-fg-subtle);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-doctag,
+.hljs-name {
+  color: #c4b5fd;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #86efac;
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: #fbbf24;
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-built_in,
+.hljs-type {
+  color: var(--color-accent);
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #f9a8d4;
+}
+
+.hljs-deletion {
+  color: var(--color-danger);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}
